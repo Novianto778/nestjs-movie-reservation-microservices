@@ -36,6 +36,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
           message = 'Validation failed';
         }
       }
+    } else if (exception instanceof Error) {
+      message = exception.message || 'Internal server error';
     }
 
     response.status(statusCode).json({

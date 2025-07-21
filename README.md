@@ -6,18 +6,18 @@ A complete system using NestJS Monorepo, RabbitMQ, Prisma, BullMQ, Saga, and Eve
 
 ## 🧱 Monorepo Structure
 
-- [ ] Set up NestJS Monorepo (`apps/`, `libs/`)
+- [v] Set up NestJS Monorepo (`apps/`, `libs/`)
 - [ ] Docker Compose for local dev (PostgreSQL, RabbitMQ, Redis)
 - [ ] Centralized `.env` config per service
 - [ ] Shared libs:
-  - [ ] `common/` for DTOs, events, exceptions
+  - [v] `common/` for DTOs, events, exceptions
   - [ ] `utils/` for helpers (Cloudinary, JWT, time)
   - [ ] `configs/` for environment/config handling
   - [ ] `decorators/`, `guards/`, `interceptors/`
 
 ---
 
-## 🔐 Auth Service (`apps/auth`)
+## 🔐 Auth Service (`apps/auth`)1
 
 ### Features
 

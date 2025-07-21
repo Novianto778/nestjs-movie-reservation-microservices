@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '../../generated/prisma';
 import { DatabaseService } from '../database/database.service';
 import { UserFilterDto } from './dto/user-filter.dto';
-import { Prisma } from '../../generated/prisma';
 
 @Injectable()
 export class UserService {
@@ -45,6 +45,15 @@ export class UserService {
     const user = await this.databaseService.user.findUnique({
       where: {
         email,
+      },
+    });
+    return user;
+  }
+
+  async getUserById(id: string) {
+    const user = await this.databaseService.user.findUnique({
+      where: {
+        id,
       },
     });
     return user;
