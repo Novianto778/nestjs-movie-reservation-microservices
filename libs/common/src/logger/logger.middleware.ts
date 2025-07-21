@@ -3,6 +3,30 @@ import { Request, Response, NextFunction } from 'express';
 import { LoggerService } from './logger.service';
 import { ConfigService } from '@nestjs/config';
 
+const redactSensitiveData = (data: any, sensitiveFields: string[]): any => {
+  if (!data || typeof data !== 'object') return data;
+
+  return Object.entries(data).reduce((acc, [key, value]) => {
+    const isSensitive = sensitiveFields.some((field) =>
+      key.toLowerCase().includes(field.toLowerCase()),
+    );
+
+    if (isSensitive) {
+      acc[key] = '***REDACTED***';
+    } else if (Array.isArray(value)) {
+      acc[key] = value.map((item) =>
+        redactSensitiveData(item, sensitiveFields),
+      );
+    } else if (value !== null && typeof value === 'object') {
+      acc[key] = redactSensitiveData(value, sensitiveFields);
+    } else {
+      acc[key] = value;
+    }
+
+    return acc;
+  }, {});
+};
+
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
   constructor(
@@ -23,14 +47,17 @@ export class LoggerMiddleware implements NestMiddleware {
       const responseTime = Date.now() - start;
       const message = `${method} ${url} ${res.statusCode} ${responseTime}ms`;
       const statusCode = res.statusCode;
-      const logData = {
-        responseTime,
-        method,
-        url,
-        headers,
-        query,
-        body,
-      };
+      const logData = redactSensitiveData(
+        {
+          responseTime,
+          method,
+          url,
+          headers,
+          query,
+          body,
+        },
+        ['password'],
+      );
 
       if (statusCode >= 500) {
         this.logger.error(message, undefined, `HTTP`, logData);
