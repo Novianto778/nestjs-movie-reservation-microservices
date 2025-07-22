@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '../../generated/prisma';
+import { Prisma, Role } from '../../generated/prisma';
 import { DatabaseService } from '../database/database.service';
 import { UserFilterDto } from './dto/user-filter.dto';
+import { PromoteUserDto } from './dto/promote-user.dto';
 
 @Injectable()
 export class UserService {
@@ -54,6 +55,18 @@ export class UserService {
     const user = await this.databaseService.user.findUnique({
       where: {
         id,
+      },
+    });
+    return user;
+  }
+
+  async promoteUser(dto: PromoteUserDto) {
+    const user = await this.databaseService.user.update({
+      where: {
+        id: dto.id,
+      },
+      data: {
+        role: dto.role,
       },
     });
     return user;

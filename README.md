@@ -21,19 +21,18 @@ A complete system using NestJS Monorepo, RabbitMQ, Prisma, BullMQ, Saga, and Eve
 
 ### Features
 
-- [ ] Register user
-- [ ] Login user (JWT)
-- [ ] User roles: `SUPER_ADMIN`, `ADMIN`, `USER`
-- [ ] Promote/demote user role
-- [ ] `GET /me` endpoint
+- [v] Register user
+- [v] Login user (JWT)
+- [v] User roles: `SUPER_ADMIN`, `ADMIN`, `USER`
+- [v] Promote/demote user role
+- [v] `GET /me` endpoint
 
 ### Implementation
 
-- [ ] JWT-based AuthGuard
-- [ ] Role-based access (`RolesGuard`)
-- [ ] Password hashing (bcrypt)
-- [ ] Prisma schema for `User`
-- [ ] Listen to `movie.created` to auto-promote user
+- [v] JWT-based AuthGuard
+- [v] Role-based access (`RolesGuard`)
+- [v] Password hashing (bcrypt)
+- [v] Prisma schema for `User`
 
 ---
 
