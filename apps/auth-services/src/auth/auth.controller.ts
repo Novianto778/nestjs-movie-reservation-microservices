@@ -1,0 +1,42 @@
+import { resMapper } from '@app/utils';
+import { Body, Controller, HttpStatus, Post, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { UserService } from '../user/user.service';
+import { AuthService } from './auth.service';
+import { LoginResponseDto } from './dto/login-response.dto';
+import { LoginDto } from './dto/login.dto';
+import { RegisterResponseDto } from './dto/register-response.dto';
+import { RegisterDto } from './dto/register.dto';
+
+@Controller('auth')
+export class AuthController {
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
+  ) {}
+
+  @Post('register')
+  async register(@Body() body: RegisterDto) {
+    const res = await this.authService.register(body);
+
+    return {
+      data: resMapper(RegisterResponseDto, res),
+      message: 'Success register',
+      status: true,
+      statusCode: HttpStatus.OK,
+    };
+  }
+
+  @UseGuards(AuthGuard('local'))
+  @Post('login')
+  async login(@Body() body: LoginDto) {
+    const res = await this.authService.login(body);
+
+    return {
+      data: resMapper(LoginResponseDto, res),
+      message: 'Success login',
+      status: true,
+      statusCode: HttpStatus.OK,
+    };
+  }
+}

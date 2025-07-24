@@ -20,7 +20,8 @@
     "test:e2e": "jest --config ./apps/api-gateway/test/jest-e2e.json",
     "start:dev:auth": "nest start auth-services --watch",
     "start:dev:api": "nest start api-gateway --watch",
-    "dev": "concurrently -n auth,api -c \"blue,green\" \"npm run start:dev:auth\" \"npm run start:dev:api\""
+    "start:dev:movie": "nest start movie-services --watch",
+    "dev": "concurrently -n auth,api,movie -c \"blue,green,yellow\" \"npm run start:dev:auth\" \"npm run start:dev:api\" \"npm run start:dev:movie\""
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

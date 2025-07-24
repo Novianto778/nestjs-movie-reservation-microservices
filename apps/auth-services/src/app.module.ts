@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { AuthServicesModule } from './auth/auth-services.module';
+import { AuthModule } from './auth/auth.module';
 import * as Joi from 'joi';
 import { UserModule } from './user/user.module';
 import env from './config/env';
+import { LoggerModule } from '@app/common';
 
 @Module({
   imports: [
+    LoggerModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: './apps/auth-services/.env',
@@ -18,7 +20,7 @@ import env from './config/env';
       }),
       load: [env],
     }),
-    AuthServicesModule,
+    AuthModule,
     UserModule,
   ],
   controllers: [],
