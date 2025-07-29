@@ -77,4 +77,13 @@ export class AuthService {
       expiresIn: this.configService.get<string>('jwtExpiresIn') as string,
     });
   }
+
+  async validateToken(token: string) {
+    try {
+      const payload = this.jwtService.decode(token);
+      return payload;
+    } catch (e) {
+      throw new UnauthorizedException('Invalid token');
+    }
+  }
 }

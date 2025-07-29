@@ -24,6 +24,12 @@
       "@app/common/*": [
         "libs/common/src/*"
       ],
+      "@app/file-upload": [
+        "libs/file-upload/src"
+      ],
+      "@app/file-upload/*": [
+        "libs/file-upload/src/*"
+      ],
       "@app/utils": [
         "libs/utils/src"
       ],

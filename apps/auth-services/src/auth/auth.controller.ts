@@ -7,13 +7,12 @@ import { LoginResponseDto } from './dto/login-response.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { RegisterDto } from './dto/register.dto';
+import { JwtAuthGuard } from './guard/jwt-auth.guard';
+import { MessagePattern, Payload, RpcException } from '@nestjs/microservices';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly userService: UserService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('register')
   async register(@Body() body: RegisterDto) {
@@ -38,5 +37,12 @@ export class AuthController {
       status: true,
       statusCode: HttpStatus.OK,
     };
+  }
+
+  // @UseGuards(JwtAuthGuard)
+  @MessagePattern('authenticate')
+  authenticate(@Payload() payload: { token: string }) {
+    const res = this.authService.validateToken(payload.token);
+    return res;
   }
 }

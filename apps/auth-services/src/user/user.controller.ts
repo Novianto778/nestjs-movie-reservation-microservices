@@ -17,6 +17,7 @@ import { Roles } from '@app/common';
 import { CurrentUser } from '@app/common/decorators/current-user.decorator';
 import { AuthorizeUserGuard } from '@app/common/guards/authorize-user.guard';
 import { PromoteUserDto } from './dto/promote-user.dto';
+import { AllowRoles } from '@app/common/decorators/allow-roles.decorator';
 
 @Controller('users')
 export class UserController {
@@ -50,6 +51,7 @@ export class UserController {
     };
   }
 
+  @AllowRoles<Role>(['ADMIN', 'SUPER_ADMIN'])
   @UseGuards(AuthGuard('jwt'), AuthorizeUserGuard)
   @Get(':id')
   async getOne(@Param('id') id: string) {
