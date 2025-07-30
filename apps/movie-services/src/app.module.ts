@@ -1,11 +1,15 @@
 import { AUTH_SERVICE, LoggerModule } from '@app/common';
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import env from './config/env';
 import { MovieModule } from './movie/movie.module';
 import { GenreModule } from './genre/genre.module';
 import { ClientsModule } from '@nestjs/microservices';
+import { TheaterModule } from './theater/theater.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import * as redisStore from 'ioredis';
+import { GlobalCacheModule } from './core/cache.module';
 
 @Module({
   imports: [
@@ -24,9 +28,10 @@ import { ClientsModule } from '@nestjs/microservices';
       }),
       load: [env],
     }),
-
+    GlobalCacheModule,
     MovieModule,
     GenreModule,
+    TheaterModule,
   ],
 })
 export class AppModule {}

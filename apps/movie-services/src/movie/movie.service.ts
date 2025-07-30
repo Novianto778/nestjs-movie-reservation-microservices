@@ -1,14 +1,33 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { NotFoundException } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { UpdateMovieDto } from './dto/update-movie.dto';
+import { CacheService } from '@app/common';
+import { REDIS_KEY } from '../constants/redis-key';
+import { QueryMovieDto } from './dto/query-movie.dto';
 
 @Injectable()
 export class MovieService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly cacheService: CacheService,
+  ) {}
 
   async create(dto: CreateMovieDto, createdBy: string) {
+    if (!createdBy) throw new UnauthorizedException('Unauthorized');
+
+    const genre = await this.databaseService.genre.findUnique({
+      where: { id: dto.genreId },
+    });
+
+    if (!genre) throw new NotFoundException('Genre not found');
+
+    const cachedMovies = await this.cacheService.get(REDIS_KEY.MOVIES);
+    if (cachedMovies) {
+      await this.cacheService.del(REDIS_KEY.MOVIES);
+    }
+
     return this.databaseService.movie.create({
       data: {
         ...dto,
@@ -17,8 +36,29 @@ export class MovieService {
     });
   }
 
-  async findAll() {
-    return this.databaseService.movie.findMany({
+  async findAll(query: QueryMovieDto) {
+    const { genreId, search, page, limit } = query;
+    const take = limit || 10;
+    const currentPage = page || 1;
+    const skip = (currentPage - 1) * take;
+    const movies = await this.cacheService.get(
+      REDIS_KEY.MOVIES_PAGINATED(currentPage, take, genreId, search),
+    );
+    const cachedTotal = await this.cacheService.get<number>(
+      REDIS_KEY.MOVIES_TOTAL_COUNT(currentPage, take, genreId, search),
+    );
+
+    if (movies && cachedTotal) {
+      return {
+        data: movies,
+        meta: {
+          totalPages: Math.ceil(cachedTotal / take),
+          currentPage,
+          totalItems: cachedTotal,
+        },
+      };
+    }
+    const res = await this.databaseService.movie.findMany({
       include: {
         genre: true,
         playings: {
@@ -27,11 +67,51 @@ export class MovieService {
           },
         },
       },
+      take,
+      skip,
+      where: {
+        genreId,
+        title: {
+          contains: search,
+        },
+      },
     });
+
+    const total = await this.databaseService.movie.count({
+      where: {
+        genreId,
+        title: {
+          contains: search,
+        },
+      },
+    });
+
+    const totalPages = Math.ceil(total / take);
+
+    await this.cacheService.set(
+      REDIS_KEY.MOVIES_PAGINATED(currentPage, take, genreId, search),
+      res,
+    );
+    await this.cacheService.set(
+      REDIS_KEY.MOVIES_TOTAL_COUNT(currentPage, take, genreId, search),
+      total,
+    );
+    return {
+      data: res,
+      meta: {
+        totalPages,
+        currentPage,
+        totalItems: total,
+      },
+    };
   }
 
   async findOne(id: string) {
-    const movie = await this.databaseService.movie.findUnique({
+    const movie = await this.cacheService.get(REDIS_KEY.MOVIES_BY_ID(id));
+    if (movie) {
+      return movie;
+    }
+    const res = await this.databaseService.movie.findUnique({
       where: { id },
       include: {
         genre: true,
@@ -43,18 +123,23 @@ export class MovieService {
       },
     });
 
-    if (!movie) throw new NotFoundException('Movie not found');
-    return movie;
+    if (!res) throw new NotFoundException('Movie not found');
+    await this.cacheService.set(REDIS_KEY.MOVIES_BY_ID(id), res);
+    return res;
   }
 
   async update(id: string, dto: UpdateMovieDto) {
-    return this.databaseService.movie.update({
+    const res = await this.databaseService.movie.update({
       where: { id },
       data: dto,
     });
+    await this.cacheService.set(REDIS_KEY.MOVIES_BY_ID(id), res);
+    await this.cacheService.del(REDIS_KEY.MOVIES);
+    return res;
   }
 
   async remove(id: string) {
+    await this.cacheService.del(REDIS_KEY.MOVIES_BY_ID(id));
     return this.databaseService.movie.delete({ where: { id } });
   }
 }

@@ -28,7 +28,6 @@ export class JwtAuthGuard implements CanActivate {
       })
       .pipe(
         tap((res) => {
-          console.log('JWT Guard', res);
           request.user = res;
         }),
         map(() => true),

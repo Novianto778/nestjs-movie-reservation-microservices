@@ -9,8 +9,6 @@ export class ProxyMiddleware implements NestMiddleware {
       req.url.startsWith(prefix),
     );
 
-    console.log('matchedRoute', matchedRoute);
-
     if (!matchedRoute) return next();
 
     // Ensure the proxy is mounted on the matched path
@@ -18,18 +16,18 @@ export class ProxyMiddleware implements NestMiddleware {
       target: proxyTable[matchedRoute],
       changeOrigin: true,
       // No need for pathRewrite in v3
-      on: {
-        proxyReq: (proxyReq, req) => {
-          console.log(
-            `[PROXY] ${req.method} ${req.url} → ${proxyReq.getHeader('host')}${proxyReq.path}`,
-          );
-        },
-        proxyRes: (proxyRes, req) => {
-          console.log(
-            `[PROXY RES] ${req.method} ${req.url} → ${proxyRes.statusCode}`,
-          );
-        },
-      },
+      // on: {
+      //   proxyReq: (proxyReq, req) => {
+      //     console.log(
+      //       `[PROXY] ${req.method} ${req.url} → ${proxyReq.getHeader('host')}${proxyReq.path}`,
+      //     );
+      //   },
+      //   proxyRes: (proxyRes, req) => {
+      //     console.log(
+      //       `[PROXY RES] ${req.method} ${req.url} → ${proxyRes.statusCode}`,
+      //     );
+      //   },
+      // },
     });
 
     // Manually extract the proxy path segment

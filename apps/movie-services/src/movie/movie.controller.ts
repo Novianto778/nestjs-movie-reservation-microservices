@@ -8,11 +8,13 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MovieService } from './movie.service';
+import { QueryMovieDto } from './dto/query-movie.dto';
 
 @Controller('movies')
 export class MovieController {
@@ -35,11 +37,12 @@ export class MovieController {
   }
 
   @Get()
-  async findAll() {
-    const movies = await this.movieService.findAll();
+  async findAll(@Query() query: QueryMovieDto) {
+    const movies = await this.movieService.findAll(query);
     return {
       message: 'Movies fetched successfully',
-      data: movies,
+      data: movies.data,
+      meta: movies.meta,
       statusCode: HttpStatus.OK,
       timestamp: new Date().toISOString(),
     };

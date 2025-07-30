@@ -1,10 +1,10 @@
+import { AUTH_SERVICE, CacheService } from '@app/common';
 import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { DatabaseModule } from '../database/database.module';
 import { MovieController } from './movie.controller';
 import { MovieService } from './movie.service';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { AUTH_SERVICE } from '@app/common';
-import { ConfigService } from '@nestjs/config';
 @Module({
   imports: [
     DatabaseModule,
@@ -18,11 +18,12 @@ import { ConfigService } from '@nestjs/config';
             port: configService.get<number>('authPort') ?? 6000,
           },
         }),
+
         inject: [ConfigService],
       },
     ]),
   ],
   controllers: [MovieController],
-  providers: [MovieService],
+  providers: [MovieService, CacheService],
 })
 export class MovieModule {}

@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
-import { GenreService } from './genre.service';
-import { GenreController } from './genre.controller';
+import { TheaterService } from './theater.service';
+import { TheaterController } from './theater.controller';
 import { DatabaseModule } from '../database/database.module';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { AUTH_SERVICE, CacheService } from '@app/common';
+import { ClientsModule } from '@nestjs/microservices';
+import { AUTH_SERVICE } from '@app/common';
 import { ConfigService } from '@nestjs/config';
+import { Transport } from '@nestjs/microservices';
+
 @Module({
   imports: [
     DatabaseModule,
@@ -22,7 +24,7 @@ import { ConfigService } from '@nestjs/config';
       },
     ]),
   ],
-  providers: [GenreService, CacheService],
-  controllers: [GenreController],
+  providers: [TheaterService],
+  controllers: [TheaterController],
 })
-export class GenreModule {}
+export class TheaterModule {}
