@@ -10,6 +10,7 @@ import { TheaterModule } from './theater/theater.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'ioredis';
 import { GlobalCacheModule } from './core/cache.module';
+import { PlayingsModule } from './playings/playings.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { GlobalCacheModule } from './core/cache.module';
     MovieModule,
     GenreModule,
     TheaterModule,
+    PlayingsModule,
   ],
 })
 export class AppModule {}

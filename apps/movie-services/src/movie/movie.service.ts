@@ -41,6 +41,8 @@ export class MovieService {
     const take = limit || 10;
     const currentPage = page || 1;
     const skip = (currentPage - 1) * take;
+    const arrayGenreId = genreId?.split(',') || [];
+
     const movies = await this.cacheService.get(
       REDIS_KEY.MOVIES_PAGINATED(currentPage, take, genreId, search),
     );
@@ -70,7 +72,9 @@ export class MovieService {
       take,
       skip,
       where: {
-        genreId,
+        genreId: {
+          in: arrayGenreId,
+        },
         title: {
           contains: search,
         },
@@ -79,7 +83,9 @@ export class MovieService {
 
     const total = await this.databaseService.movie.count({
       where: {
-        genreId,
+        genreId: {
+          in: arrayGenreId,
+        },
         title: {
           contains: search,
         },

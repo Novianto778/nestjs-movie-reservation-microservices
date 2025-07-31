@@ -1,3 +1,7 @@
+# RUN KAFKA container
+
+docker compose -f kafka-run.yml up -d
+
 # ✅ Advanced Movie Reservation System – Development Checklist
 
 A complete system using NestJS Monorepo, RabbitMQ, Prisma, BullMQ, Saga, and Event-Driven Architecture.

@@ -4,4 +4,5 @@ export const proxyTable = {
   '/movies': 'http://localhost:3002',
   '/genres': 'http://localhost:3002',
   '/theaters': 'http://localhost:3002',
+  '/playings': 'http://localhost:3002',
 };

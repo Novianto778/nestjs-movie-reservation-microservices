@@ -1,27 +1,11 @@
+import { CacheService } from '@app/common';
 import { Module } from '@nestjs/common';
-import { GenreService } from './genre.service';
-import { GenreController } from './genre.controller';
 import { DatabaseModule } from '../database/database.module';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { AUTH_SERVICE, CacheService } from '@app/common';
-import { ConfigService } from '@nestjs/config';
+import { GenreController } from './genre.controller';
+import { GenreService } from './genre.service';
+import { ClientProxyModule } from '../core/client-proxy.module';
 @Module({
-  imports: [
-    DatabaseModule,
-    ClientsModule.registerAsync([
-      {
-        name: AUTH_SERVICE,
-        useFactory: (configService: ConfigService) => ({
-          transport: Transport.TCP,
-          options: {
-            host: configService.get<string>('authHost') ?? '127.0.0.1',
-            port: configService.get<number>('authPort') ?? 6000,
-          },
-        }),
-        inject: [ConfigService],
-      },
-    ]),
-  ],
+  imports: [DatabaseModule, ClientProxyModule],
   providers: [GenreService, CacheService],
   controllers: [GenreController],
 })

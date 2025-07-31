@@ -41,8 +41,15 @@ export class AuthController {
 
   // @UseGuards(JwtAuthGuard)
   @MessagePattern('authenticate')
-  authenticate(@Payload() payload: { token: string }) {
-    const res = this.authService.validateToken(payload.token);
+  async authenticate(@Payload() payload: { token: string }) {
+    const res = await this.authService.validateToken(payload.token);
+    if (!res) {
+      throw new RpcException({
+        message: 'Invalid token',
+        status: HttpStatus.UNAUTHORIZED,
+      });
+    }
+
     return res;
   }
 }
