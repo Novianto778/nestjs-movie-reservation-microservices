@@ -1,3 +1,3 @@
 export * from './cloudinary.module';
-export * from './cloudinary.services';
-export * from './cloudinary.provider';
+export * from './utils/cloudinary.utils';
+export * from './dto/upload-signature.dto';

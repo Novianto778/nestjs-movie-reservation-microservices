@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { NotFoundException } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
@@ -6,13 +6,31 @@ import { UpdateMovieDto } from './dto/update-movie.dto';
 import { CacheService } from '@app/common';
 import { REDIS_KEY } from '../constants/redis-key';
 import { QueryMovieDto } from './dto/query-movie.dto';
+import { generateUploadSignature } from '@app/file-upload';
 
 @Injectable()
 export class MovieService {
   constructor(
     private readonly databaseService: DatabaseService,
     private readonly cacheService: CacheService,
+    @Inject('CLOUDINARY') private readonly cloudinary,
   ) {}
+
+  async getSignedParams(folder: string) {
+    return generateUploadSignature({
+      folder: folder || 'movie',
+    });
+  }
+
+  async updatePosterUrl(id: string, url: string) {
+    const movie = await this.databaseService.movie.update({
+      where: { id },
+      data: {
+        posterUrl: url,
+      },
+    });
+    return movie;
+  }
 
   async create(dto: CreateMovieDto, createdBy: string) {
     if (!createdBy) throw new UnauthorizedException('Unauthorized');

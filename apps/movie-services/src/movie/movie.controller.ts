@@ -15,6 +15,7 @@ import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MovieService } from './movie.service';
 import { QueryMovieDto } from './dto/query-movie.dto';
+import { UploadSignatureRequestDto } from '@app/file-upload';
 
 @Controller('movies')
 export class MovieController {
@@ -32,6 +33,32 @@ export class MovieController {
       message: 'Movie created successfully',
       data: movie,
       statusCode: HttpStatus.CREATED,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  @Post('upload')
+  @UseGuards(JwtAuthGuard)
+  @Roles(['ADMIN', 'SUPER_ADMIN'])
+  async upload(@Body() dto: UploadSignatureRequestDto) {
+    const movie = await this.movieService.getSignedParams(dto.folder);
+    return {
+      message: 'Upload signature generated successfully',
+      data: movie,
+      statusCode: HttpStatus.OK,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  @Post('update-poster-url')
+  @UseGuards(JwtAuthGuard)
+  @Roles(['ADMIN', 'SUPER_ADMIN'])
+  async updatePosterUrl(@Body() dto: { id: string; url: string }) {
+    const movie = await this.movieService.updatePosterUrl(dto.id, dto.url);
+    return {
+      message: 'Movie poster updated successfully',
+      data: movie,
+      statusCode: HttpStatus.OK,
       timestamp: new Date().toISOString(),
     };
   }
